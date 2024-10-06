@@ -51,12 +51,10 @@ Note: No CHAS designations for "non-metropolitan areas". Will need to cross-refe
 5. U.S. Federal Financial Institutions Examination Council (FFIEC) - Success
 
 6. U.S. Small Business Administration (SBA) - Fail
-# These data are NOT granular to census tract, but include address and zip codes.
-# Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup will be used.  This results in a different value compared with the Data Kit values.
-# Using a Zip code Census tract crosswalk file is an approximation: https://www.huduser.gov/portal/datasets/usps_crosswalk.html
+Note: These data are NOT granular to census tract, but include address and zip codes. Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup will be used.  This results in a different value compared with the Data Kit values. Using a Zip code Census tract crosswalk file is an approximation: https://www.huduser.gov/portal/datasets/usps_crosswalk.html
 
 7. Climate and Economic justice Screening Data - Fail
-# Note: CEJST_communities_list_data for energy and burden are all integers, no real numbers. Data Kit values for energy_burden_percentile are all real numbers; for burden, half are real.  Matches seem suspect.
+Note: CEJST_communities_list_data for energy and burden are all integers, no real numbers. Data Kit values for energy_burden_percentile are all real numbers; for burden, half are real.  Matches seem suspect.
 
 8. EPA EJScreen Data - Success
 
