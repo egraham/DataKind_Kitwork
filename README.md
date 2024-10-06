@@ -29,17 +29,20 @@ For the most part, I was able to find the specific data sets, download, and proc
 1. American Community Survey (ACS) Census Data - Success
 
 2. CDFI Fund (Areas of Economic Distress) - Success, with notes:
-# part (a): "yes if at least 20 percent of households in the census tract are very low-income [50% of the area median income] renters or owners who pay more than half their income for housing.  no if otherwise."
-# Note: the above statement is ambiguous: do owners also need to be very low-income?  Do very low-income renters need to pay more than half their income for housing?
-# Note: Will assume that both renters and owners are very low income and also both pay more than half their income towards housing.
-# part (d): "yes if greater than 20% of households in the census tract have incomes below the poverty rate and the census tract has a rental vacancy rate of at least 10 percent. no if otherwise."
-# Note: These criteria are ambiguous. Will assume that "below the poverty rate" is the same as "very low-income [50% of the area median income]"
-# part (e)" "yes if greater than 20% of households in the census tract have incomes below the poverty rate and the census tract has an owner vacancy rate of at least 10 percent. no if otherwise."
-# Note: These criteria are ambiguous. Will assume that "below the poverty rate" is the same as "very low-income [50% of the area median income]"
-# Note: Owner vacancy rate does not appear to be calculable from the HUD CHAS housing data.  "Vacant for sale" is perhaps the closest?
-# part (f): "yes if census tract is (1) a non-metropolitan area that: (i) qualifies as a low-income area; and (ii) is experiencing economic distress evidenced by 30 percent or more of resident households with one or more of these four housing conditions in the most recent census for which data are available: (a) lacking complete plumbing, (b) lacking complete kitchen, (c) paying 30 percent or more of income for owner costs or tenant rent, or (d) having more than 1 person per room.  no if otherwise.  "
-# Note: These criteria are ambiguous. Will assume that "low-income area" is not the same as "very low income" (above) and is thus: "greater than 50% but less than or equal to 80% of HAMFI"
-# Note: No CHAS designations for "non-metropolitan areas". Will need to cross-reference census data for Block-level Urban Area information for the 2020 Census from this page: https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html
+part (a): "yes if at least 20 percent of households in the census tract are very low-income [50% of the area median income] renters or owners who pay more than half their income for housing.  no if otherwise."
+Note: the above statement is ambiguous: do owners also need to be very low-income?  Do very low-income renters need to pay more than half their income for housing?
+Note: Will assume that both renters and owners are very low income and also both pay more than half their income towards housing.
+
+part (d): "yes if greater than 20% of households in the census tract have incomes below the poverty rate and the census tract has a rental vacancy rate of at least 10 percent. no if otherwise."
+Note: These criteria are ambiguous. Will assume that "below the poverty rate" is the same as "very low-income [50% of the area median income]"
+
+part (e)" "yes if greater than 20% of households in the census tract have incomes below the poverty rate and the census tract has an owner vacancy rate of at least 10 percent. no if otherwise."
+Note: These criteria are ambiguous. Will assume that "below the poverty rate" is the same as "very low-income [50% of the area median income]"
+Note: Owner vacancy rate does not appear to be calculable from the HUD CHAS housing data.  "Vacant for sale" is perhaps the closest?
+
+part (f): "yes if census tract is (1) a non-metropolitan area that: (i) qualifies as a low-income area; and (ii) is experiencing economic distress evidenced by 30 percent or more of resident households with one or more of these four housing conditions in the most recent census for which data are available: (a) lacking complete plumbing, (b) lacking complete kitchen, (c) paying 30 percent or more of income for owner costs or tenant rent, or (d) having more than 1 person per room.  no if otherwise.  "
+Note: These criteria are ambiguous. Will assume that "low-income area" is not the same as "very low income" (above) and is thus: "greater than 50% but less than or equal to 80% of HAMFI"
+Note: No CHAS designations for "non-metropolitan areas". Will need to cross-reference census data for Block-level Urban Area information for the 2020 Census from this page: https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html
 
 3. CDFI Fund (Investment Areas) - Success
 
