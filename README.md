@@ -1,7 +1,7 @@
 # DataKind_Kitwork
 Work with DataKind Data Kit 2024
 
-The initial R script, DataKit_explore.R, is the first step towards reproducing the DataKind 2024 Data Kit for Challenge 2 - Anticipating Household Displacement in Communities California.  
+The initial R script, "DataKit_explore_sournces.R", is the first step towards reproducing the DataKind 2024 Data Kit for Challenge 2 - Anticipating Household Displacement in Communities California.  
 
 The reasons for reproducing the data set are to (1) familiarize myself with the data (and there are also more data in the online available sets than are presented in the DataKit data sets), (2) allow others to build alternative US county "Data Kit" data sets (beyond CA and FL) to apply their analyses on those, and (3) possibly leverage any work done on the data sets by others to apply their work to King County, WA. 
 
