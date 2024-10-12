@@ -433,10 +433,15 @@ library(tidyverse)
 library(readxl)
 library(RODBC)
 
-# Set the state and county abbreviations for queries:
+# # Set the state and county abbreviations for queries:
 query_state_full <- "California"
 query_state_2 <- "CA"
 query_state_code_string <- "06"
+
+# Set the state and county abbreviations for queries:
+query_state_full <- "Washington"
+query_state_2 <- "WA"
+query_state_code_string <- "53"
 
 # ACS API keys can be obtained at https://api.census.gov/data/key_signup.html. After you’ve 
 #   signed up for an API key, be sure to activate the key from the email you receive.
@@ -599,36 +604,14 @@ saveRDS(CDFI_TLR, file="downloaded_data_sets/CDFI_TLR.RDS")
 # Data are in zip format, so need to download and unzip:
 # Note: with a slow internet connection, this will time-out before the file is downloaded!
 #   You will need to manually download the file.
-destfile <- path.expand("~/temp.zip")
+destfile <- path.expand("downloaded_data_sets/2022_combined_mlar_header.zip")
 url <- "https://s3.amazonaws.com/cfpb-hmda-public/prod/dynamic-data/combined-mlar/2022/header/2022_combined_mlar_header.zip"
 download.file(url, destfile = destfile, mode = "wb")
-HMDA_LAR <- read_delim(unz(destfile, "2022_combined_mlar_header.txt"), delim="|")
 unlink(destfile)
-colnames(HMDA_LAR)
+# colnames(HMDA_LAR)
 
-# In case of slow internet connection:
-#HMDA_LAR <- read_delim(unz("downloaded_data_sets/2022_combined_mlar_header.zip", "2022_combined_mlar_header.txt"), delim="|")
-#str(HMDA_LAR)
-
-# Note: HMDA_LAR census_tract values contain NA, loan_amount appears clean, property_value
-#   contains NA and text (e.g. "Exempt"), action_taken appears all numeric
-# Save subset of the data to reduce processing time and to avoid repeat calls
-# save only:
-#   census tract stuff and then:
-#     Median Mortgage Loan Amount (HMDA LAR)
-#     Median Property Value (HDMA LAR)
-#     Number of Mortgage Denials (HMDA LAR) <- action_taken == 3
-#     Number of Mortgage Loans (HMDA LAR) <- action_taken == 6
-#     Number of Mortgages Originated (HMDA LAR) <- action_taken == 1
-# note: activity_year all == 2022
-HMDA_LAR_subset <- HMDA_LAR |>
-  filter(state_code == query_state_2) |> 
-  select(census_tract, loan_amount, property_value, action_taken)
-
-saveRDS(HMDA_LAR_subset, file="downloaded_data_sets/HMDA_LAR_subset.RDS")
-
-# remove this massive downloaded file
-rm(HMDA_LAR)
+# In case of slow internet connection, download manually from url above and place into 
+#   download directory.
 
 # 6. ##################### U.S. Small Business Administration (SBA) ###########################
 # These are not consistent with DataKind Data Kit!
@@ -707,7 +690,7 @@ saveRDS(QCT_tract, file="downloaded_data_sets/QCT_tract.RDS")
 # Get the 2024 data here: https://docs.huduser.gov/portal/datasets/qct/qct_data_2024.xlsx
 
 ###############################################################################################
-#                        Process the data and save as files again!
+#            Process the raw data and export state-specific formatted files
 ###############################################################################################
 
 ###############################################################################################
@@ -765,7 +748,7 @@ bcodes_all_tracts_2022_format <- bcodes_all_tracts_2022 |>
 # Save geoid for joining with incomplete lists
 geoid_state <- bcodes_all_tracts_2022_format |> 
   select(geoid = GEOID)
-saveRDS(geoid_state, file="exported_data_sets/geoid_state.RDS")
+saveRDS(geoid_state, file=paste("exported_data_sets/geoid_state-", query_state_2, ".RDS", sep=""))
 ###############################################################################################
 
 # Lower-case and abbreviate "estimate" to "e" and "moe" to "m"
@@ -774,7 +757,7 @@ newnames <- substring(newnames, 1, str_length(bcodes_upper_clean_unique)+1)
 names(bcodes_all_tracts_2022_format) <- newnames
 
 # save for later assembly
-saveRDS(bcodes_all_tracts_2022_format, file="exported_data_sets/ACS_bcodes.RDS")
+saveRDS(bcodes_all_tracts_2022_format, file=paste("exported_data_sets/ACS_bcodes-", query_state_2, ".RDS", sep=""))
 
 ################################### s-coded values #############################################
 # ACS codes copy-pasted from DataKind Data Kit "data_dictionary_1-CA.csv" and 
@@ -820,7 +803,7 @@ newnames <- substring(newnames, 1, str_length(scodes_upper_clean_unique)+1)
 names(scodes_all_tracts_2022_format) <- newnames
 
 # save for later assembly
-saveRDS(scodes_all_tracts_2022_format, file="exported_data_sets/ACS_scodes.RDS")
+saveRDS(scodes_all_tracts_2022_format, file=paste("exported_data_sets/ACS_scodes-", query_state_2, ".RDS", sep=""))
 
 ################################### p-coded values #############################################
 # ACS codes copy-pasted from DataKind Data Kit "data_dictionary_1-CA.csv" and 
@@ -862,7 +845,7 @@ newnames <- substring(newnames, 1, str_length(pcodes_upper_clean_unique)+1)
 names(pcodes_all_tracts_2022_format) <- newnames
 
 # save for later assembly
-saveRDS(pcodes_all_tracts_2022_format, file="exported_data_sets/ACS_pcodes.RDS")
+saveRDS(pcodes_all_tracts_2022_format, file=paste("exported_data_sets/ACS_pcodes-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 2. ######################## CDFI Fund (Areas of Economic Distress) ##########################
@@ -1114,7 +1097,7 @@ economic_distress_agg <- criteria |>
   select(geoid, economic_distress_pop_agg, economic_distress_simple_agg) |> 
   distinct()
 
-saveRDS(economic_distress_agg, file="exported_data_sets/economic_distress_agg.RDS")
+saveRDS(economic_distress_agg, file=paste("exported_data_sets/economic_distress_agg-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 3. ################################### CDFI Fund ############################################
@@ -1133,7 +1116,7 @@ investment_areas <- CDFI_invest |>
   mutate(ct2020_chr = if_else(str_length(ct2020_chr) == 10, paste("0", ct2020_chr, sep=""), ct2020_chr)) |> 
   select(geoid=ct2020_chr, investment_areas=ia2020)
   
-saveRDS(investment_areas, file="exported_data_sets/CDFI_investment_areas.RDS")
+saveRDS(investment_areas, file=paste("exported_data_sets/CDFI_investment_areas-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # Transaction Level Report
@@ -1152,7 +1135,7 @@ CDFI_TLR_subset <- CDFI_TLR |>
   distinct()
   
 # Save
-saveRDS(CDFI_TLR_subset, file="exported_data_sets/CDFI_TLR_loans.RDS")
+saveRDS(CDFI_TLR_subset, file=paste("exported_data_sets/CDFI_TLR_loans-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 4. ############################### HUD - Opportunity Zones ##################################
@@ -1172,14 +1155,34 @@ HUD_qualified_opportunity_zones_state <- HUD_qualified_opportunity_zones |>
 #   mutate(opzone = !is.na(opzone))
 
 # Save
-saveRDS(HUD_qualified_opportunity_zones_state, file="exported_data_sets/opzone.RDS")
+saveRDS(HUD_qualified_opportunity_zones_state, file=paste("exported_data_sets/opzone-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 5. ########## U.S. Federal Financial Institutions Examination Council (FFIEC) ###############
 ###############################################################################################
 
 # Load the data from the saved file
-HMDA_LAR_subset <- readRDS(file="downloaded_data_sets/HMDA_LAR_subset.RDS")
+HMDA_LAR <- read_delim(unz("downloaded_data_sets/2022_combined_mlar_header.zip", "2022_combined_mlar_header.txt"), delim="|")
+#str(HMDA_LAR)
+
+# Note: HMDA_LAR census_tract values contain NA, loan_amount appears clean, property_value
+#   contains NA and text (e.g. "Exempt"), action_taken appears all numeric
+# Save subset of the data to reduce processing time
+# save only:
+#   census tract stuff and then:
+#     Median Mortgage Loan Amount (HMDA LAR)
+#     Median Property Value (HDMA LAR)
+#     Number of Mortgage Denials (HMDA LAR) <- action_taken == 3
+#     Number of Mortgage Loans (HMDA LAR) <- action_taken == 6
+#     Number of Mortgages Originated (HMDA LAR) <- action_taken == 1
+# note: activity_year all == 2022
+
+HMDA_LAR_subset <- HMDA_LAR |>
+  filter(state_code == query_state_2) |> 
+  select(census_tract, loan_amount, property_value, action_taken)
+
+# remove from memory if slowing things down
+rm(HMDA_LAR)
 
 median_mortgage_amount <- HMDA_LAR_subset |> 
   select(census_tract, loan_amount) |> # select only the two columns to then drop NAs
@@ -1226,7 +1229,7 @@ HMDA_LAR_values <- full_join(HMDA_LAR_values_3, num_mortgage_orig, by="geoid")
 # HMDA_LAR_values <- left_join(geoid_state, HMDA_LAR_values_4, by="geoid")
 
 # Save
-saveRDS(HMDA_LAR_values, file="exported_data_sets/HMDA_LAR_values.RDS")
+saveRDS(HMDA_LAR_values, file=paste("exported_data_sets/HMDA_LAR_values-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 6. ##################### U.S. Small Business Administration (SBA) ###########################
@@ -1294,7 +1297,7 @@ SBA_values <- SBA_3 |>
 # SBA_values <- left_join(geoid_state, SBA_3, by="geoid")
 
 # Save
-saveRDS(SBA_values, file="exported_data_sets/SBA_values.RDS")
+saveRDS(SBA_values, file=paste("exported_data_sets/SBA_values-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 7. ################## Climate and Economic justice Screening Data ###########################
@@ -1325,7 +1328,7 @@ CEJST_Energy_burden_fire_flood <- CEJST_communities_list_data |>
 # Energy_burden_fire_flood <- left_join(geoid_state, CEJST_Energy_burden, by="geoid")
 
 # Save
-saveRDS(CEJST_Energy_burden_fire_flood, file="exported_data_sets/Energy_burden.RDS")
+saveRDS(CEJST_Energy_burden_fire_flood, file=paste("exported_data_sets/Energy_burden-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 8. ############################# EPA EJScreen Data ##########################################
@@ -1356,7 +1359,7 @@ names(EJScreen_values) <- c("geoid", EJScodes)
 # EJScreen <- left_join(geoid_state, EJScreen_values, by="geoid")
 
 # Save
-saveRDS(EJScreen_values, file="exported_data_sets/EJScreen.RDS")
+saveRDS(EJScreen_values, file=paste("exported_data_sets/EJScreen-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 # 9. ###################### Low Income Housing Tax Credit (LIHTC) Program #####################
@@ -1375,7 +1378,7 @@ QCT_values <- QCT_tract |>
 # QCT_values <- left_join(geoid_state, QCT, by="geoid")
 
 # Save
-saveRDS(QCT_values, file="exported_data_sets/QCT_values.RDS")
+saveRDS(QCT_values, file=paste("exported_data_sets/QCT_values-", query_state_2, ".RDS", sep=""))
 
 ###############################################################################################
 ############################## Create the Data Kit csv files ##################################
@@ -1394,17 +1397,17 @@ data_1a <- tibble(geoid_state, "geoid_year" = 2020, "state" = as.numeric(substri
 # Start data filling
 # 7th Item: "loan_amount"
 # Note: does NOT match DataKind Data Kit values.  See (3) CDFI FUND - Transaction-level report
-CDFI_TLR_loans <- readRDS(file="exported_data_sets/CDFI_TLR_loans.RDS")
+CDFI_TLR_loans <- readRDS(file=paste("exported_data_sets/CDFI_TLR_loans-", query_state_2, ".RDS", sep=""))
 data_1b <- left_join(data_1a, CDFI_TLR_loans, by = "geoid")
 
 # Items: median_mortgage_amount, median_prop_value
-HMDA_LAR_values <- readRDS(file="exported_data_sets/HMDA_LAR_values.RDS")
+HMDA_LAR_values <- readRDS(file=paste("exported_data_sets/HMDA_LAR_values-", query_state_2, ".RDS", sep=""))
 HMDA_LAR_values_1 <- HMDA_LAR_values |> 
   select(geoid, median_mortgage_amount, median_prop_value)
 data_1c <- left_join(data_1b, HMDA_LAR_values_1, by = "geoid")
 
 # Items: median_sba504_loan_amount, median_sba7a_loan_amount
-SBA_values<- readRDS(file="exported_data_sets/SBA_values.RDS")
+SBA_values<- readRDS(file=paste("exported_data_sets/SBA_values-", query_state_2, ".RDS", sep=""))
 SBA_values_1 <- SBA_values |> 
   select(geoid, median_sba504_loan_amount, median_sba7a_loan_amount)
 data_1d <- left_join(data_1c, SBA_values_1, by = "geoid")
@@ -1420,7 +1423,7 @@ SBA_values_2 <- SBA_values |>
 data_1f <- left_join(data_1e, SBA_values_2, by = "geoid")
 
 # Items: subset of scodes ACS, see "select" statement below
-scodes_all_tracts_2022_format<- readRDS(file="exported_data_sets/ACS_scodes.RDS")
+scodes_all_tracts_2022_format<- readRDS(file=paste("exported_data_sets/ACS_scodes-", query_state_2, ".RDS", sep=""))
 scodes_all_tracts_2022_format_1 <- scodes_all_tracts_2022_format |> 
   select(geoid, s0101_c03_032m, s0101_c03_032e, s0101_c05_032e, s0101_c05_032m, 
        s0101_c01_032e, s0101_c01_032m, s0101_c04_021e, s0101_c04_021m, 
@@ -1445,13 +1448,13 @@ scodes_all_tracts_2022_format_1 <- scodes_all_tracts_2022_format |>
 data_1g <- left_join(data_1f, scodes_all_tracts_2022_format_1, by = "geoid")
 
 # Items: subset from pcodes ACS
-pcodes_all_tracts_2022_format <- readRDS(file="exported_data_sets/ACS_pcodes.RDS")
+pcodes_all_tracts_2022_format <- readRDS(file=paste("exported_data_sets/ACS_pcodes-", query_state_2, ".RDS", sep=""))
 pcodes_all_tracts_2022_format_1 <- pcodes_all_tracts_2022_format |> 
   select(geoid, dp05_0035pe, dp05_0037pe, dp05_0038pe, dp05_0039pe, dp05_0044pe, dp05_0052pe, dp05_0057pe)
 data_1h <- left_join(data_1g, pcodes_all_tracts_2022_format_1, by = "geoid")
 
 # items_ subset from bcodes ACS
-bcodes_all_tracts_2022_format <- readRDS(file="exported_data_sets/ACS_bcodes.RDS")
+bcodes_all_tracts_2022_format <- readRDS(file=paste("exported_data_sets/ACS_bcodes-", query_state_2, ".RDS", sep=""))
 bcodes_all_tracts_2022_format_1 <- bcodes_all_tracts_2022_format |> 
   select(geoid, b23025_004e, b23025_004m, b23025_005e, b23025_005m, b23025_006e, 
        b23025_006m, b23025_002e, b23025_002m)
@@ -1503,16 +1506,16 @@ data_1k <- left_join(data_1j, bcodes_all_tracts_2022_format_2, by = "geoid")
 # Items: economic_distress_pop_agg, economic_distress_simple_agg
 # Note: Descriptions of both items is identical in the data dictionary,
 #   but values in DataKind Data Kit are not!
-economic_distress_agg<- readRDS(file="exported_data_sets/economic_distress_agg.RDS")
+economic_distress_agg<- readRDS(file=paste("exported_data_sets/economic_distress_agg-", query_state_2, ".RDS", sep=""))
 data_1l <- left_join(data_1k, economic_distress_agg, by = "geoid")
 
 # Item: investment_areas
-CDFI_investment_areas <- readRDS(file="exported_data_sets/CDFI_investment_areas.RDS")
+CDFI_investment_areas <- readRDS(file=paste("exported_data_sets/CDFI_investment_areas-", query_state_2, ".RDS", sep=""))
 data_1m <- left_join(data_1l, CDFI_investment_areas, by = "geoid")
 
 # Item: opzone
 # Note: convert NA to 0
-HUD_qualified_opportunity_zones_state <- readRDS(file="exported_data_sets/opzone.RDS")
+HUD_qualified_opportunity_zones_state <- readRDS(file=paste("exported_data_sets/opzone-", query_state_2, ".RDS", sep=""))
 data_1n <- left_join(data_1m, HUD_qualified_opportunity_zones_state, by = "geoid") |> 
   mutate(opzone = if_else(is.na(opzone), 0, opzone))
 
@@ -1541,7 +1544,7 @@ data_2a <- tibble(geoid_state, "geoid_year" = 2020, "state" = as.numeric(substri
 
 # Start data filling
 # Items: cancer, d2_cancer, d5_cancer, d2_resp, resp, d5_resp
-EJScreen_values <- readRDS(file="exported_data_sets/EJScreen.RDS")
+EJScreen_values <- readRDS(file=paste("exported_data_sets/EJScreen-", query_state_2, ".RDS", sep=""))
 EJScreen_values_subset1 <- EJScreen_values |> 
   select(geoid, cancer, d2_cancer, d5_cancer, d2_resp, resp, d5_resp, d2_dslpm, d5_dslpm, 
          dslpm, d2_ptsdf, d5_ptsdf, ptsdf, pre1960, d2_ldpnt, d5_ldpnt, pre1960pct, 
@@ -1556,7 +1559,7 @@ EJScreen_values_subset1 <- EJScreen_values |>
 data_2b <- left_join(data_2a, EJScreen_values_subset1, by = "geoid")
 
 # Items: energy_burden, energy_burden_percentile
-CEJST_Energy_burden_fire_flood <- readRDS(file="exported_data_sets/Energy_burden.RDS")
+CEJST_Energy_burden_fire_flood <- readRDS(file=paste("exported_data_sets/Energy_burden-", query_state_2, ".RDS", sep=""))
 CEJST_Energy_burden_fire_flood_subset <- CEJST_Energy_burden_fire_flood |> 
   select(geoid, energy_burden, energy_burden_percentile,
          expected_agricultural_loss_rate_natural_hazards_risk_index,
@@ -1579,7 +1582,7 @@ scodes_all_tracts_2022_format_3 <- scodes_all_tracts_2022_format |>
 data_2d <- left_join(data_2c, scodes_all_tracts_2022_format_3, by = "geoid")
 
 # Item: qtc
-QCT_values <- readRDS(file="exported_data_sets/QCT_values.RDS")
+QCT_values <- readRDS(file=paste("exported_data_sets/QCT_values-", query_state_2, ".RDS", sep=""))
 data_2e <- left_join(data_2d, QCT_values, by = "geoid")
 
 # Items: subset of bcodes from ACS (again)
