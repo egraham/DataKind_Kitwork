@@ -1,0 +1,17 @@
+## Contents of exported_data_set directory
+
+Thirteen files should be in the exported_data_set subdirectory after executing the second part (1. ## Process the raw data and export formatted files ##) of the script: `Datakit_generate_formatted.R`:
+
+- ACS_bcodes.RDS
+- ACS_pcodes.RDS
+- ACS_scodes.RDS
+- CDFI_investment_areas.RDS
+- CDFI_TLR_loans.RDS
+- economic_distress_agg.RDS
+- EJScreen.RDS
+- Energy_burden.RDS
+- geoid_state.RDS
+- HMDA_LAR_values.RDS
+- opzone.RDS
+- QCT_values.RDS
+- SBA_values.RDS
