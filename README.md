@@ -25,7 +25,8 @@ For the most part, I was able to find the specific data sets, download, and proc
 
 1. American Community Survey (ACS) Census Data - Success
 
-2. CDFI Fund (Areas of Economic Distress) - Success, with notes: Part (a): "yes if at least 20 percent of households in the census tract are very low-income [50% of the area median income] renters or owners who pay more than half their income for housing. no if otherwise."
+2. CDFI Fund (Areas of Economic Distress) - Success, with notes: Is there a source here that I'm missing so that this index does not have to be calculated here?
+   - Part (a): "yes if at least 20 percent of households in the census tract are very low-income [50% of the area median income] renters or owners who pay more than half their income for housing. no if otherwise."
 
    - **Note:** the above statement is ambiguous: do owners also need to be very low-income? Do very low-income renters need to pay more than half their income for housing?
 
@@ -48,7 +49,7 @@ For the most part, I was able to find the specific data sets, download, and proc
    - **Note:** No CHAS designations for "non-metropolitan areas". Will need to cross-reference census data for Block-level Urban Area information for the 2020 Census from this page:
 [https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html](https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html)
 
-3. CDFI Fund (Investment Areas)
+4. CDFI Fund (Investment Areas)
    - Investment Areas - Success
    - Transaction Level Report - **Fail!**
      - Description in the Data Dictionary: 
@@ -91,22 +92,22 @@ For the most part, I was able to find the specific data sets, download, and proc
 
     - **Will use "ReleaseTLRfy21.csv" because descriptions of data sources match**
 
-4. HUD - Opportunity Zones - Success
+5. HUD - Opportunity Zones - Success
 
-5. U.S. Federal Financial Institutions Examination Council (FFIEC) - Success
+6. U.S. Federal Financial Institutions Examination Council (FFIEC) - Success
 
-6. U.S. Small Business Administration (SBA) - **Fail!**
+7. U.S. Small Business Administration (SBA) - **Fail!**
    - These are not consistent with DataKind Data Kit!
    - These data are NOT granular to census tract, but include address and zip codes.
    - Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup will be used.  This results in a different value compared with the Data Kit values.
    - Using a Zip code Census tract crosswalk file is an approximation: [https://www.huduser.gov/portal/datasets/usps_crosswalk.html](https://www.huduser.gov/portal/datasets/usps_crosswalk.html)
 
-7. Climate and Economic justice Screening Data - Fail
+8. Climate and Economic justice Screening Data - Fail
    - **Note:** CEJST_communities_list_data for energy and burden are all integers, no real numbers. Data Kit values for energy_burden_percentile are all real numbers; for burden, half are real.  Matches seem suspect.
 
-8. EPA EJScreen Data - Success
+9. EPA EJScreen Data - Success
 
-9. Low Income Housing Tax Credit (LIHTC) Program - Success?
+10. Low Income Housing Tax Credit (LIHTC) Program - Success?
    - **Note:** all values in the Qualified Census Tract (qct) column in the DataKind Data Kit are zero.
 
 ### Inconsistencies with DataKit and this output data_1.csv file
