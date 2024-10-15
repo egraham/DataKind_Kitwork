@@ -1,12 +1,13 @@
-## Work with DataKind Data Kit 2024 - R script
+## Work with DataKind Data Kit 2024 - R script for Challenge #2
+Challenge #2: [https://github.com/datakind/datakit-housing-fall-2024/discussions/2](https://github.com/datakind/datakit-housing-fall-2024/discussions/2)
 
 `DataKit_generate_formatted.R`, is the first step towards reproducing the DataKind 2024 Data Kit for Challenge 2 - Anticipating Household Displacement in Communities California.
 
-The reasons for reproducing the data set are to (1) familiarize myself with the data (and there are also more data in the online available sets than are presented in the DataKit data sets), (2) allow others to build alternative US county "Data Kit" data sets (beyond CA and FL) to apply their analyses on those, and (3) possibly leverage any work done on the data sets by others to apply their work to King County, WA. And to practice my R skills.
+The reasons for reproducing the data set are to (1) familiarize myself with the data, (2) allow others to build alternative US state or county "Data Kit" data sets (beyond CA and FL) to apply their analyses on those, and (3) possibly leverage any work done on the data sets by others to apply their work to King County, WA. And to practice my R skills.
 
-`DataKit_generate_formatted.R` goes through each data source and tries to match what is found in both the data_dictionary_1-CA.csv and data_dictionary_2-CA.csv files.
+These data are also available via the DataKind website interface, but on a county-level web-form basis (not state-wide, as far as I can tell).  This script will download and format state-level data, selecting only the data in the DataKit (other values are available in the downloaded data but are not saved in a CSV output file here).
 
-Challenge #2: [https://github.com/datakind/datakit-housing-fall-2024/discussions/2](https://github.com/datakind/datakit-housing-fall-2024/discussions/2)
+`DataKit_generate_formatted.R` goes through each data **source** and tries to match what is found in both the data_dictionary_1-CA.csv and data_dictionary_2-CA.csv files.
 
 Working from the document, data_dictionary_1-CA.csv, the list of sources is:
 
@@ -19,13 +20,14 @@ Working from the document, data_dictionary_1-CA.csv, the list of sources is:
 7. Working from the document, data_dictionary_2-CA.csv, additional sources are: 7. CEJST - Communities Data, Climate and 8. Economic Justice Screening Tool (CEJST) 8. EJScreen - Indexes, Environmental Protection Agency (EPA) 
 9. Low Income Housing Tax Credit (LIHTC) Program - Qualified Census Tracts, U.S. Department of Housing and Urban Development (HUD)
 
-For the most part, I was able to find the specific data sets, download, and process the data to match the DataKind Data Kit CA data sets. ** However, some I failed to reproduce some subsets! ** Please see the end of this document for a list and the following section for details:
+For the most part, I was able to find the specific data sets, download, and process the data to match the DataKind Data Kit CA data sets. Please see the end of this document for a list and the following section for details:
 
 ### Each source:
 
-1. American Community Survey (ACS) Census Data - Success
+1. American Community Survey (ACS) Census Data - Success, a match with the DataKind Data Kit values.
 
 2. CDFI Fund (Areas of Economic Distress) - Success, with notes: Is there a source here that I'm missing so that this index does not have to be calculated here?
+
    - Part (a): "yes if at least 20 percent of households in the census tract are very low-income [50% of the area median income] renters or owners who pay more than half their income for housing. no if otherwise."
 
      - **Note:** the above statement is ambiguous: do owners also need to be very low-income? Do very low-income renters need to pay more than half their income for housing?
@@ -49,90 +51,36 @@ For the most part, I was able to find the specific data sets, download, and proc
      - **Note:** No CHAS designations for "non-metropolitan areas". Will need to cross-reference census data for Block-level Urban Area information for the 2020 Census from this page:
 [https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html](https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html)
 
-4. CDFI Fund (Investment Areas)
+3. CDFI Fund (Investment Areas)
    - Investment Areas - Success
-   - Transaction Level Report - **Fail!**
-     - Description in the Data Dictionary: 
-       - item: loan_amount = Total CDFI Lending Reported (CDFI Fund Transaction Level Report)
-       - original loan/investment amount
-       - CDFI Fund (TLR)
-       - U.S. Department of the Treasury Community Development Financial Institutions Fund (CDFI Fund)
-       - 2021
-     - Data Kit data_1-CA.csv, "loan_amount"
-       - 6001400400 = 614.43
-       - 6001400700 = 7888.64
-       - 6001400800 = 88162.75
-     - Files from: [https://www.cdfifund.gov/news/529](https://www.cdfifund.gov/news/529)
-     - File: "2021 CDFI Program and NACA Program Data Release: Data, Documentation, and Instructions (.zip)"
-       - https://www.cdfifund.gov/sites/cdfi/files/2023-07/FY2021_Data_Documentation_Instruction.zip
-       - "ReleaseTLRfy21.csv": No match:
-         - 6001400400 = no data
-         - 6001400700 = no data
-         - 6001400800 = 73200.
+   - Transaction Level Report - Success
 
-       - "ReleaseCLRfy21.csv": No match
-         - 6001400400 = 539
-         - 6001400700 = 7483
-         - 6001400800 = 1000
-         - 6001400800 = 6705, total = 7705
+4. HUD - Opportunity Zones - Success
 
-     - Files from: https://www.cdfifund.gov/documents/data-releases?page=0
-     - File: "FY 2023 NMTC Public Data Release: 2003-2021 Data File"
-       - [https://www.cdfifund.gov/sites/cdfi/files/2023-08/NMTC_Public_Data_Release_includes_FY_2021_Data_final.xlsx](https://www.cdfifund.gov/sites/cdfi/files/2023-08/NMTC_Public_Data_Release_includes_FY_2021_Data_final.xlsx)
-       - Financial notes and Projects tabs: No match
-       - No data for geoids 6001400400, 6001400700, 
-       - 6001400800 = $700,000.00.
+5. U.S. Federal Financial Institutions Examination Council (FFIEC) - Success
 
-     - No matches for other files: 
-    - FY_2020_NMTC_Public_Data_Release.xlsx
-    - NMTC_Public_Data_Release_Includes_FY2020_Data_revised.xlsx
-    - NMTC_Public_Data_Release_includes_FY_2022_Data_final.xlsx
-    - ReleaseTLRfy20.csv
-    - ReleaseCLRfy20.csv
-
-    - **Will use "ReleaseTLRfy21.csv" because descriptions of data sources match**
-
-5. HUD - Opportunity Zones - Success
-
-6. U.S. Federal Financial Institutions Examination Council (FFIEC) - Success
-
-7. U.S. Small Business Administration (SBA) - **Fail!**
-   - These are not consistent with DataKind Data Kit!
-   - These data are NOT granular to census tract, but include address and zip codes.
-   - Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup will be used.  This results in a different value compared with the Data Kit values.
+6. U.S. Small Business Administration (SBA) - **Fail**
+   - The SBA source data are not immediately compatible with current Data Kit information.
+   - Source download lacks census tract (geoid) information.
+   - Source data include address, city, state, and zip codes.  A lookup per address to gain census tract information is possible: [https://geocoding.geo.census.gov/geocoder/geographies/address?](https://geocoding.geo.census.gov/geocoder/geographies/address?)
+   - Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup was be used.  This results in a different value compared with the Data Kit values.
    - Using a Zip code Census tract crosswalk file is an approximation: [https://www.huduser.gov/portal/datasets/usps_crosswalk.html](https://www.huduser.gov/portal/datasets/usps_crosswalk.html)
 
-8. Climate and Economic justice Screening Data - Fail
-   - **Note:** CEJST_communities_list_data for energy and burden are all integers, no real numbers. Data Kit values for energy_burden_percentile are all real numbers; for burden, half are real.  Matches seem suspect.
+7. Climate and Economic justice Screening Data - moderate success
+   - **Note:** CEJST_communities_list_data match for most of the data values in the Data Kit set.  Non-matches may be updates?
 
-9. EPA EJScreen Data - Success
+8. EPA EJScreen Data - Success
 
-10. Low Income Housing Tax Credit (LIHTC) Program - Success?
-   - **Note:** all values in the Qualified Census Tract (qct) column in the DataKind Data Kit are zero.
+9. Low Income Housing Tax Credit (LIHTC) Program - Success
 
-### Inconsistencies with DataKit and this output data_1.csv file
-- CDFI Fund Transaction Level Report:
-  - loan_amount
+Inconsistencies with DataKit and this output data_1.csv file
 - All data from SBA:
   - median_sba504_loan_amount
   - median_sba7a_loan_amount
   - number_of_sba504_loans
   - number_of_sba7a_loans
+
+These data do not appear in the online DataKind set:
 - CDFI Fund (Areas of Economic Distress):
   - economic_distress_pop_agg
   - economic_distress_simple_agg
-
-### Inconsistencies with DataKit and this output data_2.csv file
-- All data from the CEJST communities data set:
-  - energy_burden
-  - energy_burden_percentile
-  - expected_agricultural_loss_rate_natural_hazards_risk_index
-  - expected_agricultural_loss_rate_natural_hazards_risk_index_percentile
-  - expected_building_loss_rate_natural_hazards_risk_index
-  - expected_building_loss_rate_natural_hazards_risk_index_percentile
-  - expected_population_loss_rate_natural_hazards_risk_index
-  - expected_population_loss_rate_natural_hazards_risk_index_percentile
-  - share_of_properties_at_risk_of_fire_in_30_years
-  - share_of_properties_at_risk_of_fire_in_30_years_percentile
-  - share_of_properties_at_risk_of_flood_in_30_years
-  - share_of_properties_at_risk_of_flood_in_30_years_percentile
