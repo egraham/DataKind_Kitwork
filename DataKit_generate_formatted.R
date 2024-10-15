@@ -2,7 +2,7 @@
 #   Household Displacement in Communities California: Challenge #2.
 #   https://github.com/datakind/datakit-housing-fall-2024/discussions/2
 
-# This script should reproduce the data set for any county in the US, within the issues described
+# This script should reproduce the data sets for any state in the US, within the issues described
 #   in the script "DataKit_explore_sources.R", which describes the inconsistencies (echoed below also).
 
 # Note: this script is also terrible for memory management (multiple variable names are kept) 
@@ -299,7 +299,7 @@
 #
 #   3. Community Development Financial Institutions Fund (CDFI Fund)
 #     (1) investment_areas; CDFI Fund Investment Areas
-#     (2) loan_amount; Total CDFI Lending Reported (CDFI Fund Transaction Level Report)
+#     (2) total_cdfi_lending (was "loan_amount"); Total CDFI Lending Reported (CDFI Fund Transaction Level Report)
 #
 #   4. HUD - Opportunity Zones (U.S. Department of Housing and Urban Development)
 #     (1) opzone; HUD - Opportunity Zones (U.S. Department of Housing and Urban Development)
@@ -503,7 +503,8 @@ UA_Blocks_2020 <- read_delim("https://www2.census.gov/geo/docs/reference/ua/2020
 saveRDS(UA_Blocks_2020, file="downloaded_data_sets/UA_Blocks_2020.RDS")
 
 # 3. ################################### CDFI Fund ############################################
-# Investment Areas
+#################################
+# Investment Areas - success
 
 # Updated CDFI Program Investment Areas
 #   https://www.cdfifund.gov/news/498
@@ -521,51 +522,16 @@ unlink(destfile)
 # Save the data to avoid repeat calls
 saveRDS(CDFI_invest, file="downloaded_data_sets/CDFI_invest.RDS")
 
-# Transaction Level Report - Fail!
+#################################
+# Transaction Level Report - success
 
 # Description in the Data Dictionary: 
-#   Item: loan_amount = Total CDFI Lending Reported (CDFI Fund Transaction Level Report)
+#   Item: total_cdfi_lending = Total CDFI Lending Reported (CDFI Fund Transaction Level Report)
+#     (was "loan_amount")
 #   original loan/investment amount
 #   CDFI Fund (TLR)
 #   U.S. Department of the Treasury Community Development Financial Institutions Fund (CDFI Fund)
-#   2021
-
-# Data Kit data_1-CA.csv, "loan_amount"
-#   6001400400 = 614.43
-#   6001400700 = 7888.64
-#   6001400800 = 88162.75
-
-# Files from: https://www.cdfifund.gov/news/529
-# File: "2021 CDFI Program and NACA Program Data Release: Data, Documentation, and Instructions (.zip)"
 #   https://www.cdfifund.gov/sites/cdfi/files/2023-07/FY2021_Data_Documentation_Instruction.zip
-#   "ReleaseTLRfy21.csv": 
-#   6001400400 = no data
-#   6001400700 = no data
-#   6001400800 = 73200.
-# No match
-#   "ReleaseCLRfy21.csv": 
-#   6001400400 = 539
-#   6001400700 = 7483
-#   6001400800 = 1000
-#   6001400800 = 6705, total = 7705
-# No match
-
-# Files from: https://www.cdfifund.gov/documents/data-releases?page=0
-# File: "FY 2023 NMTC Public Data Release: 2003-2021 Data File"
-#   https://www.cdfifund.gov/sites/cdfi/files/2023-08/NMTC_Public_Data_Release_includes_FY_2021_Data_final.xlsx
-# Financial notes and Projects tabs: 
-#   No data for geoids 6001400400, 6001400700, 
-#   6001400800 = $700,000.00.
-# No match
-
-# No matches for other files: 
-#   FY_2020_NMTC_Public_Data_Release.xlsx
-#   NMTC_Public_Data_Release_Includes_FY2020_Data_revised.xlsx
-#   NMTC_Public_Data_Release_includes_FY_2022_Data_final.xlsx
-#   ReleaseTLRfy20.csv
-#   ReleaseCLRfy20.csv
-
-# Will use "ReleaseTLRfy21.csv" because descriptions of data sources match
 
 # Data are in zip format, so need to download and unzip:
 destfile <- path.expand("~/temp.zip")
@@ -614,11 +580,14 @@ unlink(destfile)
 #   download directory.
 
 # 6. ##################### U.S. Small Business Administration (SBA) ###########################
-# These are not consistent with DataKind Data Kit!
+# These data are NOT granular to census tract, do not include census tract information,
+#   but include address, city, state, and zip codes.
 
-# These data are NOT granular to census tract, but include address and zip codes
+# Possible to do a GET on each address using the Census website?>\
+#   https://geocoding.geo.census.gov/geocoder/geographies/address?street=14131%20FOOTHILL%20BLVD&city=SYLMAR&state=CA&zip=91342&benchmark=4&vintage=4
+
 # Rather than do an address lookup for each entry in a county, a zipcode-to-tract-lookup 
-#   will be used.  This results in a different value compared with the Data Kit values.
+#   is used here.  This results in a different value compared with the Data Kit values.
 # Using a Zip code Census tract crosswalk file is an approximation:
 #   https://www.huduser.gov/portal/datasets/usps_crosswalk.html
 
@@ -647,7 +616,7 @@ saveRDS(SBA_504, file="downloaded_data_sets/SBA_504.RDS")
 saveRDS(SBA_7, file="downloaded_data_sets/SBA_7.RDS")
 
 # 7. ################## Climate and Economic justice Screening Data ###########################
-# These are NOT consistent with DataKind Data Kit!
+# These mostly consistent with DataKind Data Kit
 
 # Get the data from a link on this page:
 #    https://screeningtool.geoplatform.gov/en/downloads
@@ -674,7 +643,7 @@ unlink(temp)
 saveRDS(EJScreen_tract, file="downloaded_data_sets/EJScreen_tract.RDS")
 
 # 9. ###################### Low Income Housing Tax Credit (LIHTC) Program #####################
-# Note: all values in the Qualified Census Tract (qct) column in the DataKind Data Kit are zero.
+# Success
 
 # Get the 2018 data from this page:
 # Data are in Excel format, so need to download, read Excel file:
@@ -1086,7 +1055,7 @@ criteria <- left_join(criteria_5, criterion_f, by="geoid")
 # test if any (a) - (f) are true (logical ORs). If so, then TRUE.
 
 # Note: currently, "economic_distress_pop_agg" and "economic_distress_simple_agg" descriptions are
-#   identical.  However, data in Data Kit are not!
+#   identical.  However, data in Data Kit are not.
 
 # Current solution: duplicate "economic_distress_pop_agg" and label as "economic_distress_simple_agg"
 economic_distress_agg <- criteria |> 
@@ -1131,7 +1100,7 @@ CDFI_TLR_subset <- CDFI_TLR |>
   group_by(projectfipscode_2010) |> 
   mutate(loan_amount = sum(originalamount)) |> 
   ungroup() |> 
-  select(geoid = projectfipscode_2010, loan_amount) |> 
+  select(geoid = projectfipscode_2010, total_cdfi_lending) |> 
   distinct()
   
 # Save
@@ -1165,7 +1134,7 @@ saveRDS(HUD_qualified_opportunity_zones_state, file=paste("exported_data_sets/op
 HMDA_LAR <- read_delim(unz("downloaded_data_sets/2022_combined_mlar_header.zip", "2022_combined_mlar_header.txt"), delim="|")
 #str(HMDA_LAR)
 
-# Note: HMDA_LAR census_tract values contain NA, loan_amount appears clean, property_value
+# Note: HMDA_LAR census_tract values contain NA, loan_amount appears "clean", property_value
 #   contains NA and text (e.g. "Exempt"), action_taken appears all numeric
 # Save subset of the data to reduce processing time
 # save only:
@@ -1395,7 +1364,8 @@ data_1a <- tibble(geoid_state, "geoid_year" = 2020, "state" = as.numeric(substri
                  "county_fips_code" = as.numeric(substring(unname(unlist(geoid_state)), 3, 5)))
 
 # Start data filling
-# 7th Item: "loan_amount"
+# 7th Item: "total_cdfi_lending"
+#   (was "loan_amount")
 # Note: does NOT match DataKind Data Kit values.  See (3) CDFI FUND - Transaction-level report
 CDFI_TLR_loans <- readRDS(file=paste("exported_data_sets/CDFI_TLR_loans-", query_state_2, ".RDS", sep=""))
 data_1b <- left_join(data_1a, CDFI_TLR_loans, by = "geoid")
@@ -1523,7 +1493,7 @@ data_1n <- left_join(data_1m, HUD_qualified_opportunity_zones_state, by = "geoid
 write_csv(data_1n, file=paste("data_1-", query_state_2, "_new.csv", sep=""))
 
 ############# Inconsistencies with DataKit and this output data_1.csv file ##################
-# loan_amount
+
 # median_sba504_loan_amount
 # median_sba7a_loan_amount
 # number_of_sba504_loans
@@ -1592,19 +1562,3 @@ data_2f <- left_join(data_2e, bcodes_all_tracts_2022_format_3, by = "geoid")
 
 # Write newly constructed csv file data_1
 write_csv(data_2f, file=paste("data_2-", query_state_2, "_new.csv", sep=""))
-
-############# Inconsistencies with DataKit and this output data_2.csv file ##################
-# All data from the CEJST communities data set:
-#
-# energy_burden
-# energy_burden_percentile
-# expected_agricultural_loss_rate_natural_hazards_risk_index
-# expected_agricultural_loss_rate_natural_hazards_risk_index_percentile
-# expected_building_loss_rate_natural_hazards_risk_index
-# expected_building_loss_rate_natural_hazards_risk_index_percentile
-# expected_population_loss_rate_natural_hazards_risk_index
-# expected_population_loss_rate_natural_hazards_risk_index_percentile
-# share_of_properties_at_risk_of_fire_in_30_years
-# share_of_properties_at_risk_of_fire_in_30_years_percentile
-# share_of_properties_at_risk_of_flood_in_30_years
-# share_of_properties_at_risk_of_flood_in_30_years_percentile
